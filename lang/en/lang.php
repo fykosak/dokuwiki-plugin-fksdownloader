@@ -9,7 +9,9 @@
 // $lang['menu'] = 'Your menu entry';
 
 // custom language strings for the plugin
-// $lang['fixme'] = 'FIXME';
+$lang['download_failed_export'] = 'Couldn\'t download fresh version of export with QID \'%s\'.';
+$lang['download_failed_results'] = 'Couldn\'t download fresh version of results.';
+$lang['download_failed_http'] = 'Couldn\'t download fresh version of file from \'%s\'.';
 
 
 

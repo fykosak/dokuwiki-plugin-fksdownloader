@@ -6,5 +6,11 @@
  */
 
 
-//$meta['fixme'] = array('string');
+$meta['wsdl'] = array('string');
+$meta['fksdb_login'] = array('string');
+$meta['fksdb_password'] = array('password');
+$meta['http_host'] = array('string');
+$meta['http_login'] = array('string');
+$meta['http_password'] = array('password');
+$meta['tmp_dir'] = array('string');
 
