@@ -2,7 +2,7 @@
 /**
  * English language file for fksdownloader plugin
  *
- * @author Michal Koutný <michal@fykos.cz>
+ * @author Michal KoutnÃ½ <michal@fykos.cz>
  */
 
 // menu entry for admin plugins

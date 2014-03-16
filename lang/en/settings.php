@@ -2,7 +2,7 @@
 /**
  * english language file for fksdownloader plugin
  *
- * @author Michal Koutný <michal@fykos.cz>
+ * @author Michal KoutnÃ½ <michal@fykos.cz>
  */
 
 // keys need to match the config setting name

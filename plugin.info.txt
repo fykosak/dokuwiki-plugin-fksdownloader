@@ -1,5 +1,5 @@
 base   fksdownloader
-author Michal Koutný
+author Michal KoutnÃ½
 email  michal@fykos.cz
 date   2014-03-16
 name   fksdownloader plugin
