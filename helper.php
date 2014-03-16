@@ -68,47 +68,64 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
         );
     }
 
-    public function downloadExport($qid, $parameters) {
-        $request = $this->soap->createExportRequest($qid, $parameters);
-        $xml = $this->soap->callMethod('GetExport', $request);
+    public function downloadExport($expiration, $qid, $parameters) {
+        $filename = 'export.' . self::getExportId($qid, $parameters);
+        $that = $this;
+        return $this->tryCache($filename, $expiration, function() use($qid, $parameters, $that) {
+                            $request = $that->soap->createExportRequest($qid, $parameters);
+                            $xml = $that->soap->callMethod('GetExport', $request);
 
-        if (!$xml) {
-            msg('fksdownloader: ' . sprintf($this->getLang('download_failed_export'), $qid), -1);
-            return null;
-        } else {
-            return $xml;
-        }
+                            if (!$xml) {
+                                msg('fksdownloader: ' . sprintf($this->getLang('download_failed_export'), $qid), -1);
+                                return null;
+                            } else {
+                                return $xml;
+                            }
+                        });
     }
 
-    public function downloadResultsDetail($contest, $year, $series) {
-        $request = $this->soap->createResultsDetailRequest($contest, $year, $series);
-        return $this->downloadResults($request);
+    public function downloadResultsDetail($expiration, $contest, $year, $series) {
+        $filename = sprintf('result.detail.%s.%s.%s', $contest, $year, $series);
+        $that = $this;
+        return $this->tryCache($filename, $expiration, function() use($contest, $year, $series, $that) {
+                            $request = $that->soap->createResultsDetailRequest($contest, $year, $series);
+                            return $this->downloadResults($request);
+                        });
     }
 
-    public function downloadResultsCummulative($contest, $year, $series) {
-        $request = $this->soap->createResultsCummulativeRequest($contest, $year, $series);
-        return $this->downloadResults($request);
+    public function downloadResultsCummulative($expiration, $contest, $year, $series) {
+        $filename = sprintf('result.cumm.%s.%s.%s', $contest, $year, implode('', $series));
+        $that = $this;
+        return $this->tryCache($filename, $expiration, function() use($contest, $year, $series, $that) {
+                            $request = $that->soap->createResultsCummulativeRequest($contest, $year, $series);
+                            return $this->downloadResults($request);
+                        });
     }
 
-    public function downloadWebServer($path) {
-        if ($this->getConf('http_user')) {
-            $auth = $this->getConf('http_user') . ':' . $this->getConf('http_password');
-        } else {
-            $auth = '';
-        }
-        $host = $this->getConf('http_host');
+    public function downloadWebServer($expiration, $path) {
+        $namePath = str_replace('/', '_', $path);
+        $filename = sprintf('http.%s', $namePath);
+        $that = $this;
+        return $this->tryCache($filename, $expiration, function() use($path, $that) {
+                            if ($that->getConf('http_user')) {
+                                $auth = $that->getConf('http_user') . ':' . $that->getConf('http_password');
+                            } else {
+                                $auth = '';
+                            }
+                            $host = $that->getConf('http_host');
 
-        $src = "http://$auth@{$host}{$path}"; // TODO ? rawurlencode($path)
+                            $src = "http://$auth@{$host}{$path}"; // TODO ? rawurlencode($path)
 
-        $dst = tempnam($this->getConf('temp_dir'), 'fks');
+                            $dst = tempnam($that->getConf('temp_dir'), 'fks');
 
-        if (!@copy($src, $dst)) {
-            msg('fksdownloader: ' . sprintf($this->getLang('download_failed_http'), $path), -1);
-            return null;
-        }
-        $content = file_get_contents($dst);
-        unlink($dst);
-        return $content;
+                            if (!@copy($src, $dst)) {
+                                msg('fksdownloader: ' . sprintf($that->getLang('download_failed_http'), $path), -1);
+                                return null;
+                            }
+                            $content = file_get_contents($dst);
+                            unlink($dst);
+                            return $content;
+                        });
     }
 
     private function downloadResults($request) {
@@ -120,6 +137,40 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
         } else {
             return $xml;
         }
+    }
+
+    private function tryCache($filename, $expiration, $contentCallback) {
+        $cached = $this->getFromCache($filename, $expiration);
+
+        if (!$cached) {
+            $content = call_user_func($contentCallback);
+            if ($content) {
+                $this->putToCache($filename, $content);
+            }
+        } else {
+            return $cached;
+        }
+    }
+
+    private function getFromCache($filename, $expiration) {
+        $id = $this->getPluginName() . ':' . $filename;
+        $realFilename = metaFN($id, '.xml');
+        if (file_exists($realFilename) && filemtime($realFilename) + $expiration >= time()) {
+            return io_readFile($realFilename);
+        } else {
+            return null;
+        }
+    }
+
+    private function putToCache($filename, $content) {
+        $id = $this->getPluginName() . ':' . $filename;
+        $realFilename = metaFN($id, '.xml');
+        io_saveFile($realFilename, $content);
+    }
+
+    public static function getExportId($qid, $parameters) {
+        $hash = md5(serialize($parameters));
+        return $qid . '_' . $hash;
     }
 
 }
