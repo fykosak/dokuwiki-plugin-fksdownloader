@@ -10,7 +10,12 @@
 if (!defined('DOKU_INC'))
     die();
 
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'inc' . DIRECTORY_SEPARATOR . 'soap.php';
+
 class helper_plugin_fksdownloader extends DokuWiki_Plugin {
+
+    const EXPIRATION_FRESH = 0;
+    const EXPIRATION_NEVER = 0x7fffffff;
 
     /**
      * @var fksdownloader_soap 
