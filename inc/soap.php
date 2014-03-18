@@ -79,7 +79,7 @@ class fksdownloader_soap {
             call_user_func(array($this->client, $methodName), $request);
             return $this->client->__getLastResponse();
         } catch (SoapFault $e) {
-            msg('fksdownloader: ' . $e->getMessage(), -1);
+            msg('fksdownloader: server error: ' . $e->getMessage(), -1);
         }
     }
 
