@@ -153,6 +153,7 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
             if ($content) {
                 $this->putToCache($filename, $content);
             }
+            return $content;
         } else {
             return $cached;
         }
