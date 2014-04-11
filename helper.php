@@ -20,7 +20,7 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
     /**
      * @var fksdownloader_soap 
      */
-    private $soap;
+    public $soap;
 
     public function __construct() {
         $this->soap = new fksdownloader_soap($this->getConf('wsdl'), $this->getConf('fksdb_login'), $this->getConf('fksdb_password'));
