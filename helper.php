@@ -133,7 +133,12 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
                         });
     }
 
-    private function downloadResults($request) {
+    /**
+     * @internal
+     * @param mixed $request
+     * @return string
+     */
+    public function downloadResults($request) {
         $xml = $this->soap->callMethod('GetResults', $request);
 
         if (!$xml) {
