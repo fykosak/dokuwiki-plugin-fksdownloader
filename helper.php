@@ -94,7 +94,7 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
         $that = $this;
         return $this->tryCache($filename, $expiration, function() use($contest, $year, $series, $that) {
                             $request = $that->soap->createResultsDetailRequest($contest, $year, $series);
-                            return $this->downloadResults($request);
+                            return $that->downloadResults($request);
                         });
     }
 
@@ -103,7 +103,7 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
         $that = $this;
         return $this->tryCache($filename, $expiration, function() use($contest, $year, $series, $that) {
                             $request = $that->soap->createResultsCummulativeRequest($contest, $year, $series);
-                            return $this->downloadResults($request);
+                            return $that->downloadResults($request);
                         });
     }
 
