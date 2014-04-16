@@ -145,7 +145,6 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
             msg('fksdownloader: ' . sprintf($this->getLang('download_failed_results')), -1);
             return null;
         } else {
-            msg('fksdownloader: download');
             return $xml;
         }
     }
