@@ -112,19 +112,20 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
         $filename = sprintf('http.%s', $namePath);
         $that = $this;
         return $this->tryCache($filename, $expiration, function() use($path, $that) {
-                            if ($that->getConf('http_user')) {
-                                $auth = $that->getConf('http_user') . ':' . $that->getConf('http_password');
+                            if ($that->getConf('http_login')) {
+                                $auth = $that->getConf('http_login') . ':' . $that->getConf('http_password') . '@';
                             } else {
                                 $auth = '';
                             }
                             $host = $that->getConf('http_host');
 
-                            $src = "http://$auth@{$host}{$path}"; // TODO ? rawurlencode($path)
+                            $src = "http://$auth{$host}{$path}"; // TODO ? rawurlencode($path)
 
                             $dst = tempnam($that->getConf('temp_dir'), 'fks');
 
                             if (!@copy($src, $dst)) {
-                                msg('fksdownloader: ' . sprintf($that->getLang('download_failed_http'), $path), -1);
+                                $safeSrc = "http://{$host}{$path}"; // TODO ? rawurlencode($path)
+                                msg('fksdownloader: ' . sprintf($that->getLang('download_failed_http'), $safeSrc), -1);
                                 return null;
                             }
                             $content = file_get_contents($dst);
