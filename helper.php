@@ -108,8 +108,7 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
     }
 
     public function downloadWebServer($expiration, $path) {
-        $namePath = str_replace('/', '_', $path);
-        $filename = sprintf('http.%s', $namePath);
+        $filename = self::getWebServerFilename($path);
         $that = $this;
         return $this->tryCache($filename, $expiration, function() use($path, $that) {
                             if ($that->getConf('http_login')) {
@@ -132,6 +131,11 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
                             unlink($dst);
                             return $content;
                         });
+    }
+
+    public static function getWebServerFilename($path) {
+        $namePath = str_replace('/', '_', $path);
+        return sprintf('http.%s', $namePath);
     }
 
     /**
@@ -165,8 +169,7 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
     }
 
     private function getFromCache($filename, $expiration) {
-        $id = $this->getPluginName() . ':' . $filename;
-        $realFilename = metaFN($id, '.xml');
+        $realFilename = $this->getCacheFilename($filename);
         if (file_exists($realFilename) && filemtime($realFilename) + $expiration >= time()) {
             return io_readFile($realFilename);
         } else {
@@ -175,9 +178,13 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
     }
 
     private function putToCache($filename, $content) {
-        $id = $this->getPluginName() . ':' . $filename;
-        $realFilename = metaFN($id, '.xml');
+        $realFilename = $this->getCacheFilename($filename);
         io_saveFile($realFilename, $content);
+    }
+
+    public function getCacheFilename($filename) {
+        $id = $this->getPluginName() . ':' . $filename;
+        return metaFN($id, '.xml');
     }
 
     public static function getExportId($qid, $parameters) {
