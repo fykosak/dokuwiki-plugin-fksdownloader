@@ -73,11 +73,11 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
         );
     }
 
-    public function downloadExport($expiration, $qid, $parameters) {
-        $filename = 'export.' . self::getExportId($qid, $parameters);
+    public function downloadExport($expiration, $qid, $parameters, $formatVersion = 1) {
+        $filename = 'export.' . $formatVersion . '.' . self::getExportId($qid, $parameters);
         $that = $this;
-        return $this->tryCache($filename, $expiration, function() use($qid, $parameters, $that) {
-                            $request = $that->soap->createExportRequest($qid, $parameters);
+        return $this->tryCache($filename, $expiration, function() use($qid, $parameters, $formatVersion, $that) {
+                            $request = $that->soap->createExportRequest($qid, $parameters, $formatVersion);
                             $xml = $that->soap->callMethod('GetExport', $request);
 
                             if (!$xml) {

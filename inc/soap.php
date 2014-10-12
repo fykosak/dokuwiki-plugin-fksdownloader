@@ -37,7 +37,7 @@ class fksdownloader_soap {
         $this->client->__setSoapHeaders($headers);
     }
 
-    public function createExportRequest($qid, $parameters) {
+    public function createExportRequest($qid, $parameters, $formatVersion = null) {
         $parametersXML = array();
         foreach ($parameters as $name => $value) {
             $parametersXML[] = array(
@@ -45,10 +45,14 @@ class fksdownloader_soap {
                 '_' => $value,
             );
         }
-        return array(
+        $request = array(
             'qid' => $qid,
             'parameter' => $parametersXML,
         );
+        if ($formatVersion !== null) {
+            $request['format-version'] = $formatVersion;
+        }
+        return $request;
     }
 
     public function createResultsDetailRequest($contest, $year, $series) {
