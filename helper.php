@@ -20,11 +20,7 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
     /**
      * @var fksdownloader_soap 
      */
-    public $soap;
-
-    public function __construct() {
-        $this->soap = new fksdownloader_soap($this->getConf('wsdl'), $this->getConf('fksdb_login'), $this->getConf('fksdb_password'));
-    }
+    private $soap;
 
     /**
      * Return info about supported methods in this Helper Plugin
@@ -77,8 +73,8 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
         $filename = 'export.' . $formatVersion . '.' . self::getExportId($qid, $parameters);
         $that = $this;
         return $this->tryCache($filename, $expiration, function() use($qid, $parameters, $formatVersion, $that) {
-                            $request = $that->soap->createExportRequest($qid, $parameters, $formatVersion);
-                            $xml = $that->soap->callMethod('GetExport', $request);
+                            $request = $that->getSoap()->createExportRequest($qid, $parameters, $formatVersion);
+                            $xml = $that->getSoap()->callMethod('GetExport', $request);
 
                             if (!$xml) {
                                 msg('fksdownloader: ' . sprintf($this->getLang('download_failed_export'), $qid), -1);
@@ -93,7 +89,7 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
         $filename = sprintf('result.detail.%s.%s.%s', $contest, $year, $series);
         $that = $this;
         return $this->tryCache($filename, $expiration, function() use($contest, $year, $series, $that) {
-                            $request = $that->soap->createResultsDetailRequest($contest, $year, $series);
+                            $request = $that->getSoap()->createResultsDetailRequest($contest, $year, $series);
                             return $that->downloadResults($request);
                         });
     }
@@ -102,7 +98,7 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
         $filename = sprintf('result.cumm.%s.%s.%s', $contest, $year, implode('', $series));
         $that = $this;
         return $this->tryCache($filename, $expiration, function() use($contest, $year, $series, $that) {
-                            $request = $that->soap->createResultsCummulativeRequest($contest, $year, $series);
+                            $request = $that->getSoap()->createResultsCummulativeRequest($contest, $year, $series);
                             return $that->downloadResults($request);
                         });
     }
@@ -146,7 +142,7 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
      * @return string
      */
     public function downloadResults($request) {
-        $xml = $this->soap->callMethod('GetResults', $request);
+        $xml = $this->getSoap()->callMethod('GetResults', $request);
 
         if (!$xml) {
             msg('fksdownloader: ' . sprintf($this->getLang('download_failed_results')), -1);
@@ -154,6 +150,17 @@ class helper_plugin_fksdownloader extends DokuWiki_Plugin {
         } else {
             return $xml;
         }
+    }
+    
+    /**
+     * @internal
+     * @return fksdownloader_soap
+     */
+    public function getSoap() {
+        if ($this->soap === null) {
+            $this->soap = new fksdownloader_soap($this->getConf('wsdl'), $this->getConf('fksdb_login'), $this->getConf('fksdb_password'));
+        }
+        return $this->soap;
     }
 
     private function tryCache($filename, $expiration, $contentCallback) {
