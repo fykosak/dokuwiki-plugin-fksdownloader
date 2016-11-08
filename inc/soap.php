@@ -80,6 +80,16 @@ class fksdownloader_soap {
         );
     }
 
+    public function createResultsSchoolCummulativeRequest($contest, $year, $series) {
+        return array(
+            'contest' => $contest,
+            'year' => $year,
+            'school-cumulatives' => array(// supports bundling multiple cummulative specifications in on request
+                'school-cumulative' => $series, // list of series
+            ),
+        );
+    }
+
     /**
      * @param string
      * @param mixed $request
