@@ -5,12 +5,12 @@
  *
  * @author Michal Koutný <michal@fykos.cz>
  */
-$meta['wsdl'] = array('string');
-$meta['fksdb_login'] = array('string');
-$meta['fksdb_password'] = array('password');
-$meta['http_host'] = array('string');
-$meta['http_scheme'] = array('multichoice', '_choices' => array('http', 'https'));
-$meta['http_login'] = array('string');
-$meta['http_password'] = array('password');
-$meta['tmp_dir'] = array('string');
+$meta['wsdl'] = ['string'];
+$meta['fksdb_login'] = ['string'];
+$meta['fksdb_password'] = ['password'];
+$meta['http_host'] = ['string'];
+$meta['http_scheme'] = ['multichoice', '_choices' => ['http', 'https']];
+$meta['http_login'] = ['string'];
+$meta['http_password'] = ['password'];
+$meta['tmp_dir'] = ['string'];
 
