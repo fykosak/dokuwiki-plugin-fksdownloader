@@ -6,8 +6,6 @@
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Michal Koutný <michal@fykos.cz>
  */
-
-// must be run within Dokuwiki
 use dokuwiki\Extension\Plugin;
 use Fykosak\FKSDBDownloaderCore\FKSDBDownloader;
 use Fykosak\FKSDBDownloaderCore\Requests\EventListRequest;
@@ -52,7 +50,7 @@ class helper_plugin_fksdownloader extends Plugin {
     public function downloadWebServer(int $expiration, string $path): callable {
         $filename = self::getWebServerFilename($path);
 
-        return $this->tryCache($filename, $expiration, function () use ($path) {
+        return $this->tryCache($filename, $expiration, function () use ($path): ?string {
             if ($this->getConf('http_login')) {
                 $auth = $this->getConf('http_login') . ':' . $this->getConf('http_password') . '@';
             } else {
@@ -93,7 +91,7 @@ class helper_plugin_fksdownloader extends Plugin {
         return $this->downloader;
     }
 
-    private function tryCache(string $filename, int $expiration, callable $contentCallback) {
+    private function tryCache(string $filename, int $expiration, callable $contentCallback): ?string {
         $cached = $this->getFromCache($filename, $expiration);
 
         if (!$cached) {
@@ -121,7 +119,7 @@ class helper_plugin_fksdownloader extends Plugin {
         }
     }
 
-    private function getFromCache($filename, int $expiration) {
+    private function getFromCache(string $filename, int $expiration): ?string {
         $realFilename = $this->getCacheFilename($filename);
         if (file_exists($realFilename) && filemtime($realFilename) + $expiration >= time()) {
             return io_readFile($realFilename);
@@ -144,5 +142,4 @@ class helper_plugin_fksdownloader extends Plugin {
         $hash = md5(serialize($parameters));
         return $qid . '_' . $hash;
     }
-
 }
