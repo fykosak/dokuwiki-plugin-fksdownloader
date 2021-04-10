@@ -143,8 +143,4 @@ class helper_plugin_fksdownloader extends Plugin {
         $id = $this->getPluginName() . ':' . $filename;
         return metaFN($id, '.xml');
     }
-
-    public static function getExportId(?string $qid, array $parameters): string {
-        return (new ExportRequest($qid, $parameters))->getCacheKey();
-    }
 }
