@@ -9,6 +9,6 @@
         }
     ],
     "require": {
-        "fykosak/fksdb-downloader-core": "dev-master"
+        "fykosak/fksdb-downloader-core": "1.1.0"
     }
 }

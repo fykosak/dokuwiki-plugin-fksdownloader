@@ -6,8 +6,10 @@
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Michal Koutný <michal@fykos.cz>
  */
+
 use dokuwiki\Extension\Plugin;
 use Fykosak\FKSDBDownloaderCore\FKSDBDownloader;
+use Fykosak\FKSDBDownloaderCore\Requests\Event\ParticipantsListRequest;
 use Fykosak\FKSDBDownloaderCore\Requests\EventListRequest;
 use Fykosak\FKSDBDownloaderCore\Requests\ExportRequest;
 use Fykosak\FKSDBDownloaderCore\Requests\OrganizersRequest;
@@ -28,23 +30,27 @@ class helper_plugin_fksdownloader extends Plugin {
     private FKSDBDownloader $downloader;
 
     public function downloadExport(int $expiration, string $qid, array $parameters, int $formatVersion = 2): string {
-        return $this->tryCache2(new ExportRequest($qid, $parameters, $formatVersion), $expiration);
+        return $this->downloadFKSDB(new ExportRequest($qid, $parameters, $formatVersion), $expiration);
     }
 
-    public function downloadResultsDetail(int $expiration, int $contest, int $year, int $series): string {
-        return $this->tryCache2(new ResultsDetailRequest($contest, $year, $series), $expiration);
+    public function downloadResultsDetail(int $expiration, int $contestId, int $year, int $series): string {
+        return $this->downloadFKSDB(new ResultsDetailRequest($contestId, $year, $series), $expiration);
     }
 
-    public function downloadResultsCummulative(int $expiration, int $contest, int $year, array $series): string {
-        return $this->tryCache2(new ResultsCumulativeRequest($contest, $year, $series), $expiration);
+    public function downloadResultsCummulative(int $expiration, int $contestId, int $year, array $series): string {
+        return $this->downloadFKSDB(new ResultsCumulativeRequest($contestId, $year, $series), $expiration);
     }
 
-    public function downloadOrganisers(int $expiration, int $contest, ?int $year): string {
-        return $this->tryCache2(new OrganizersRequest($contest, $year), $expiration);
+    public function downloadOrganisers(int $expiration, int $contestId, ?int $year): string {
+        return $this->downloadFKSDB(new OrganizersRequest($contestId, $year), $expiration);
     }
 
     public function downloadEventsList(int $expiration, array $eventTypeIds): string {
-        return $this->tryCache2(new EventListRequest($eventTypeIds), $expiration);
+        return $this->downloadFKSDB(new EventListRequest($eventTypeIds), $expiration);
+    }
+
+    public function downloadEventParticipants(int $expiration, int $eventId, array $statuses = []): string {
+        return $this->downloadFKSDB(new ParticipantsListRequest($eventId, $statuses), $expiration);
     }
 
     public function downloadWebServer(int $expiration, string $path): callable {
@@ -105,7 +111,7 @@ class helper_plugin_fksdownloader extends Plugin {
         }
     }
 
-    private function tryCache2(Request $request, int $expiration): string {
+    private function downloadFKSDB(Request $request, int $expiration): string {
         $cached = $this->getFromCache($request->getCacheKey(), $expiration);
 
         if (!$cached) {
@@ -139,7 +145,6 @@ class helper_plugin_fksdownloader extends Plugin {
     }
 
     public static function getExportId(?string $qid, array $parameters): string {
-        $hash = md5(serialize($parameters));
-        return $qid . '_' . $hash;
+        return (new ExportRequest($qid, $parameters))->getCacheKey();
     }
 }
