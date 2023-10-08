@@ -17,8 +17,9 @@ use Fykosak\FKSDBDownloaderCore\Requests\Request;
 use Fykosak\FKSDBDownloaderCore\Requests\Results\ResultsCumulativeRequest;
 use Fykosak\FKSDBDownloaderCore\Requests\Results\ResultsDetailRequest;
 
-if (!defined('DOKU_INC'))
+if (!defined('DOKU_INC')) {
     die();
+}
 
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
@@ -89,7 +90,7 @@ class helper_plugin_fksdownloader extends Plugin {
     private function getSoap(): FKSDBDownloader {
         if (!isset($this->downloader)) {
             try {
-                $this->downloader = new FKSDBDownloader($this->getConf('wsdl'), $this->getConf('fksdb_login'), $this->getConf('fksdb_password'));
+                $this->downloader = new FKSDBDownloader($this->getConf('wsdl'), $this->getConf('fksdb_login'), $this->getConf('fksdb_password'), $this->getConf('fksdb_json_api'));
             } catch (SoapFault $e) {
                 msg('fksdbexport: ' . $e->getMessage(), -1);
             }

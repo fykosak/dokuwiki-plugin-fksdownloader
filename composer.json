@@ -9,6 +9,7 @@
         }
     ],
     "require": {
-        "fykosak/fksdb-downloader-core": "1.1.0"
+        "fykosak/fksdb-downloader-core": "1.5.*",
+        "php": ">=7.4"
     }
 }

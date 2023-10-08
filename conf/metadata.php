@@ -8,6 +8,7 @@
 $meta['wsdl'] = ['string'];
 $meta['fksdb_login'] = ['string'];
 $meta['fksdb_password'] = ['password'];
+$meta['fksdb_json_api'] = ['string'];
 $meta['http_host'] = ['string'];
 $meta['http_scheme'] = ['multichoice', '_choices' => ['http', 'https']];
 $meta['http_login'] = ['string'];
