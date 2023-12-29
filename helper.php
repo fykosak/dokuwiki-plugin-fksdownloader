@@ -53,7 +53,7 @@ class helper_plugin_fksdownloader extends Plugin {
         return $this->downloadFKSDB(new ParticipantsListRequest($eventId, $statuses), $expiration);
     }
 
-    public function downloadWebServer(int $expiration, string $path): callable {
+    public function downloadWebServer(int $expiration, string $path): ?string {
         $filename = self::getWebServerFilename($path);
 
         return $this->tryCache($filename, $expiration, function () use ($path): ?string {
